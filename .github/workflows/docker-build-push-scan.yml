@@ -3,6 +3,11 @@ name: Docker Image Build, Push and Scan
 
 on:
   workflow_call:
+    inputs:
+      context:
+        description: 'Docker build context'
+        default: '.'
+        type: string
 
 env:
   git_commit: ${{ github.sha }}
@@ -22,6 +27,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64
+        context: ${{ inputs.context }}
         load: true
         build-args: |
           GIT_COMMIT=${{ env.git_commit }}
@@ -32,6 +38,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64
+        context: ${{ inputs.context }}
         push: true
         tags: |
           ghcr.io/${{ github.repository }}:${{ env.git_commit }}
