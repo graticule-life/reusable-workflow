@@ -4,8 +4,8 @@ name: Docker Image Build, Push and Scan
 on:
   workflow_call:
     inputs:
-      context:
-        description: 'Docker build context'
+      subdir:
+        description: 'Docker build context subdirectory'
         default: '.'
         type: string
 
@@ -27,7 +27,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64
-        context: ${{ inputs.context }}
+        context: "{{ defaultContext }}:${{ inputs.subdir }}"
         load: true
         build-args: |
           GIT_COMMIT=${{ env.git_commit }}
@@ -38,7 +38,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64
-        context: ${{ inputs.context }}
+        context: "{{ defaultContext }}:${{ inputs.subdir }}"
         push: true
         tags: |
           ghcr.io/${{ github.repository }}:${{ env.git_commit }}
