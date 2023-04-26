@@ -1,0 +1,42 @@
+name: Republish Docker Image from ghcr to ecr
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'GitHub environment name'
+        type: string
+
+env:
+  git_commit: ${{ github.sha }}
+jobs:
+  republish:
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write   # This is required for requesting the OIDC JWT
+      packages: read   # This is required for ghcr.io pull
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull prior job built image
+      run: docker pull ghcr.io/${{ github.repository }}:${{ env.git_commit }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    - name: Login to sandbox ECR
+      uses: docker/login-action@v2
+      with:
+          registry: ${{ vars.AWS_REGISTRY }}
+    - name: Docker tag
+      run: docker tag ghcr.io/${{ github.repository }}:${{ env.git_commit }} ${{ vars.AWS_REGISTRY }}/${{ github.repository }}:${{ env.git_commit }}
+    - name: Docker push
+      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ github.repository }}
