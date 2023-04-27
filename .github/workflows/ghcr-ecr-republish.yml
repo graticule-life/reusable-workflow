@@ -37,7 +37,7 @@ jobs:
       with:
         aws-region: ${{ vars.AWS_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-    - name: Login to sandbox ECR
+    - name: Login to ECR
       uses: docker/login-action@v2
       with:
           registry: ${{ vars.AWS_REGISTRY }}
