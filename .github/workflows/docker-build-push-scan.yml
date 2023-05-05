@@ -17,7 +17,7 @@ env:
   git_commit: ${{ github.sha }}
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
