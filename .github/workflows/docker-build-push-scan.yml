@@ -12,10 +12,6 @@ on:
         description: 'Dockerfile path'
         default: './Dockerfile'
         type: string
-    secrets:
-      AWS_ROLE_TO_ASSUME:
-        description: 'IAM role with ecr permissions'
-        required: true
 
 env:
   git_commit: ${{ github.sha }}
