@@ -15,7 +15,14 @@ on:
 
 env:
   git_commit: ${{ github.sha }}
+  REPO: ${{ github.repository}}
+
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: downcase REPO
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
   build:
     runs-on: ubuntu-latest
     steps:
@@ -37,8 +44,8 @@ jobs:
         build-args: |
           GIT_COMMIT=${{ env.git_commit }}
         tags: |
-          ghcr.io/${{ github.repository }}:${{ env.git_commit }}
-          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${REPO}:${{ env.git_commit }}
+          ghcr.io/${REPO}:latest
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:

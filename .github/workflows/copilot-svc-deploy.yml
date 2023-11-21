@@ -1,0 +1,28 @@
+name: Use Copilot to deploy app to an environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'GitHub environment name'
+        required: true
+        type: string
+    secrets:
+      AWS_ROLE_TO_ASSUME:
+        description: 'IAM role with ecr permissions'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    - name: Login to ECR
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ vars.AWS_REGISTRY }}
+    # copilot deploy
