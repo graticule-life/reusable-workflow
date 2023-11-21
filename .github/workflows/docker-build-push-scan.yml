@@ -18,21 +18,11 @@ env:
   REPO: ${{ github.repository }}
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: downcase REPO
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
-      - name: echo
-        run: echo "REPO=$REPO"
-      - name: echo 2
-        run: echo ${{ env.REPO }}
-      - name: echo 3
-        run: echo $REPO
   build:
-    needs:  setup
     runs-on: ubuntu-latest
     steps:
+    - name: downcase REPO
+      run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to GitHub Container Registry
