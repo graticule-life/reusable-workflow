@@ -60,6 +60,8 @@ jobs:
         context: "{{ defaultContext }}:${{ inputs.context }}"
         file: ${{ inputs.file }}
         push: true
-        tags: ${{ steps.build.outputs.tags }}
+        tags: |
+          ghcr.io/${{ env.REPO }}:${{ env.git_commit }}
+          ghcr.io/${{ env.REPO }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
