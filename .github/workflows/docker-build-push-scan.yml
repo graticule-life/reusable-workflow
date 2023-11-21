@@ -24,6 +24,7 @@ jobs:
       - name: downcase REPO
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
   build:
+    needs:  setup
     runs-on: ubuntu-latest
     steps:
     - name: Set up Docker Buildx
@@ -35,6 +36,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Docker build
+      id:   build
       uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64
@@ -44,12 +46,12 @@ jobs:
         build-args: |
           GIT_COMMIT=${{ env.git_commit }}
         tags: |
-          ghcr.io/${REPO}:${{ env.git_commit }}
-          ghcr.io/${REPO}:latest
+          ghcr.io/${{ env.REPO }}:${{ env.git_commit }}
+          ghcr.io/${{ env.REPO }}:latest
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ghcr.io/${{ github.repository }}:${{ env.git_commit }}
+        image-ref: ghcr.io/${{ env.REPO }}:${{ env.git_commit }}
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
@@ -63,7 +65,7 @@ jobs:
         file: ${{ inputs.file }}
         push: true
         tags: |
-          ghcr.io/${{ github.repository }}:${{ env.git_commit }}
-          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${{ env.REPO }}:${{ env.git_commit }}
+          ghcr.io/${{ env.REPO }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
