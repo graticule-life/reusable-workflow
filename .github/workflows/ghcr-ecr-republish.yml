@@ -14,6 +14,7 @@ on:
 
 env:
   git_commit: ${{ github.sha }}
+  REPO:       ${{ github.repository }}
 jobs:
   republish:
     environment: ${{ inputs.environment }}
@@ -22,6 +23,8 @@ jobs:
       packages: read   # This is required for ghcr.io pull
     runs-on: ubuntu-latest
     steps:
+    - name: downcase REPO
+      run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to GitHub Container Registry
@@ -31,7 +34,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull prior job built image
-      run: docker pull ghcr.io/${{ github.repository }}:${{ env.git_commit }}
+      run: docker pull ghcr.io/${{ env.REPO }}:${{ env.git_commit }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
@@ -42,6 +45,6 @@ jobs:
       with:
           registry: ${{ vars.AWS_REGISTRY }}
     - name: Docker tag
-      run: docker tag ghcr.io/${{ github.repository }}:${{ env.git_commit }} ${{ vars.AWS_REGISTRY }}/${{ github.repository }}:${{ env.git_commit }}
+      run: docker tag ghcr.io/${{ env.REPO }}:${{ env.git_commit }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ env.git_commit }}
     - name: Docker push
-      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ github.repository }}
+      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}
