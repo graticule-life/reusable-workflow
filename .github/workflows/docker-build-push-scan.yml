@@ -15,7 +15,7 @@ on:
 
 env:
   git_commit: ${{ github.sha }}
-  REPO: ${{ github.repository}}
+  REPO: ${{ github.repository }}
 
 jobs:
   setup:
@@ -23,6 +23,12 @@ jobs:
     steps:
       - name: downcase REPO
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+      - name: echo
+        run: echo "REPO=$REPO"
+      - name: echo 2
+        run: echo ${{ env.REPO }}
+      - name: echo 3
+        run: echo $REPO
   build:
     needs:  setup
     runs-on: ubuntu-latest
