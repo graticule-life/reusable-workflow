@@ -26,6 +26,7 @@ on:
 
 jobs:
   svc-deploy:
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     steps:
     - name: Configure AWS Credentials
