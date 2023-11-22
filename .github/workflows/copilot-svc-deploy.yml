@@ -19,6 +19,14 @@ on:
         description: 'copilot svc name'
         required: true
         type: string
+      aws_region:
+        description: 'region for AWS_ROLE_TO_ASSUME'
+        required: true
+        type: string
+      aws_registry:
+        description: 'region for AWS_ROLE_TO_ASSUME'
+        required: true
+        type: string
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with copilot permissions'
@@ -32,7 +40,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
-        aws-region: ${{ vars.AWS_REGION }}
+        aws-region: ${{ inputs.AWS_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
     - name: Login to ECR
       uses: docker/login-action@v2
