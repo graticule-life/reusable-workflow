@@ -28,7 +28,7 @@ jobs:
     - name: Login to ECR
       uses: aws-actions/amazon-ecr-login@v2
     - name: Copilot svc deploy
-      uses: ksivamuthu/aws-copilot-github-action@v0.0.6
+      uses: ksivamuthu/aws-copilot-github-action@v0.0.7
       with:
           command: deploy
           app: ${{ vars.COPILOT_APPLICATION }}
