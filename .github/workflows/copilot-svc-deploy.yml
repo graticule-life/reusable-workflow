@@ -31,6 +31,6 @@ jobs:
       uses: ksivamuthu/aws-copilot-github-action@v0.0.6
       with:
           command: deploy
-          app: ${{ vars.cp_app }}
-          env: ${{ vars.cp_env }}
-          name: ${{ vars.cp_svc }}
+          app: ${{ vars.COPILOT_APPLICATION }}
+          env: ${{ vars.COPILOT_ENVIRONMENT }}
+          name: ${{ vars.COPILOT_SERVICE }}
