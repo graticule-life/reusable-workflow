@@ -7,26 +7,6 @@ on:
         description: 'GitHub repo environment name'
         required: true
         type: string
-      cp_app:
-        description: 'copilot app name'
-        required: true
-        type: string
-      cp_env:
-        description: 'copilot env name'
-        required: true
-        type: string
-      cp_svc:
-        description: 'copilot svc name'
-        required: true
-        type: string
-      aws_region:
-        description: 'region for AWS_ROLE_TO_ASSUME'
-        required: true
-        type: string
-      aws_registry:
-        description: 'registry for image storage'
-        required: true
-        type: string
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with copilot permissions'
@@ -51,6 +31,6 @@ jobs:
       uses: ksivamuthu/aws-copilot-github-action@v0.0.6
       with:
           command: deploy
-          app: ${{ env.cp_app }}
-          env: ${{ env.cp_env }}
-          name: ${{ env.cp_svc }}
+          app: ${{ vars.cp_app }}
+          env: ${{ vars.cp_env }}
+          name: ${{ vars.cp_svc }}
