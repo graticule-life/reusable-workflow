@@ -24,7 +24,7 @@ on:
         required: true
         type: string
       aws_registry:
-        description: 'region for AWS_ROLE_TO_ASSUME'
+        description: 'registry for image storage'
         required: true
         type: string
     secrets:
@@ -41,16 +41,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1-node16
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-region: ${{ vars.AWS_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
     - name: Login to ECR
-      uses: docker/login-action@v2
-      with:
-        registry: ${{ inputs.aws_registry }}
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      uses: aws-actions/amazon-ecr-login@v2
     - name: Copilot svc deploy
       uses: ksivamuthu/aws-copilot-github-action@v0.0.6
       with:
