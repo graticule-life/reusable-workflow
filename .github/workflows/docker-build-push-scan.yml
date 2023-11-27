@@ -40,6 +40,7 @@ jobs:
         file: ${{ inputs.file }}
         load: true
         build-args: |
+          BUILDKIT_INLINE_CACHE=1
           GIT_COMMIT=${{ env.git_commit }}
         tags: |
           ghcr.io/${{ env.REPO }}:${{ env.git_commit }}
