@@ -33,7 +33,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Docker build
       id:   build
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
