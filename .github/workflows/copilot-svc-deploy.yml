@@ -36,4 +36,4 @@ jobs:
           app: ${{ vars.COPILOT_APPLICATION }}
           env: ${{ vars.COPILOT_ENVIRONMENT }}
           name: ${{ vars.COPILOT_SERVICE }}
-          version: 1.32.0
+          version: v1.32.0
