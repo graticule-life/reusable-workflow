@@ -25,4 +25,4 @@ jobs:
             test) echo "github-environment=test" >> "$GITHUB_OUTPUT" ;;
             *) echo "github-environment=dev" >> "$GITHUB_OUTPUT" ;;
           esac
-      
+      - run: echo ${{ needs.select-environment.outputs.github-environment }}
