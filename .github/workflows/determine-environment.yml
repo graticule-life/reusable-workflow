@@ -1,0 +1,20 @@
+name: Determine github environment based on branch
+
+on:
+  workflow_call:
+
+jobs:
+  determine-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Select Environment
+        id: select-environment
+        run: |
+          case "${{ github.base_ref }}" in
+            (main) echo "github-environment=prod" >> "$GITHUB_OUTPUT" ;;
+            (beta) echo "github-environment=beta" >> "$GITHUB_OUTPUT" ;;
+            (test) echo "github-environment=test" >> "$GITHUB_OUTPUT" ;;
+            (*) echo "github-environment=dev" >> "$GITHUB_OUTPUT" ;;
+          esac
+    outputs:
+      github-environment: ${{ steps.select-environment.outputs.github-environment }}
