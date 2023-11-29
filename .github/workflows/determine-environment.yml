@@ -12,11 +12,13 @@ jobs:
         run: |
           if [[ "${{ github.head_ref }}" ]]
           then
+            echo "${{ github.head_ref }}""
             export VALUE="${{ github.head_ref }}"
           else
+            echo "${{ github.ref }}"
             export VALUE="${{ github.ref }}"
           fi
-          case "$VALUE" in
+          case $VALUE in
             (main) echo "github-environment=prod" >> "$GITHUB_OUTPUT" ;;
             (beta) echo "github-environment=beta" >> "$GITHUB_OUTPUT" ;;
             (test) echo "github-environment=test" >> "$GITHUB_OUTPUT" ;;
