@@ -29,9 +29,3 @@ jobs:
             test) echo "github-environment=test" >> "$GITHUB_OUTPUT" ;;
             *) echo "github-environment=dev" >> "$GITHUB_OUTPUT" ;;
           esac
-      - run: echo ${{ steps.select-environment.outputs.github-environment }}
-  echo:
-    runs-on: ubuntu-latest
-    needs: determine-environment
-    steps:
-      - run: echo ${{ needs.determine-environment.select-environment.outputs.github-environment }}
