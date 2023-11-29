@@ -12,7 +12,7 @@ jobs:
         run: |
           if [[ "${{ github.head_ref }}" ]]
           then
-            export VALUE="${{ github.base_ref }}"
+            export VALUE="${{ github.head_ref }}"
           else
             export VALUE="${{ github.ref }}"
           fi
