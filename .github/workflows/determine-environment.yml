@@ -13,7 +13,8 @@ jobs:
     outputs:
       github-environment: ${{ steps.select-environment.outputs.github-environment }}
     steps:
-      - id: select-environment
+      - name: Select Environment
+        id: select-environment
         run: |
           if [[ "${{ github.head_ref }}" ]]
           then
@@ -29,3 +30,9 @@ jobs:
             test) echo "github-environment=test" >> "$GITHUB_OUTPUT" ;;
             *) echo "github-environment=dev" >> "$GITHUB_OUTPUT" ;;
           esac
+      - name: Echo
+        run: |
+          echo ${{ needs.determine-environment.outputs.github-environment }}
+          echo "env = ${{ needs.determine-environment.outputs.github-environment }}"
+          echo ${{ steps.select-environment.outputs.github-environment }}
+          echo "env = ${{ steps.select-environment.outputs.github-environment }}"
