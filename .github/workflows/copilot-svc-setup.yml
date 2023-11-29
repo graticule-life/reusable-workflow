@@ -29,11 +29,11 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
     - name: Checkout repo
       uses: actions/checkout@v4
-    - name: Copilot svc deploy
-      uses: ksivamuthu/aws-copilot-github-action@v0.0.7
-      with:
-          command: deploy
-          app: ${{ vars.COPILOT_APPLICATION }}
-          env: ${{ vars.COPILOT_ENVIRONMENT }}
-          name: ${{ vars.COPILOT_SERVICE }}
-          version: v1.32.0
+    # - name: Copilot svc deploy
+    #   uses: ksivamuthu/aws-copilot-github-action@v0.0.7
+    #   with:
+    #       command: deploy
+    #       app: ${{ vars.COPILOT_APPLICATION }}
+    #       env: ${{ vars.COPILOT_ENVIRONMENT }}
+    #       name: ${{ vars.COPILOT_SERVICE }}
+    #       version: v1.32.0
