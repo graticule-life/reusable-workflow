@@ -12,7 +12,7 @@ jobs:
         run: |
           if [[ "${{ github.head_ref }}" ]]
           then
-            echo "${{ github.head_ref }}""
+            echo "${{ github.head_ref }}"
             export VALUE="${{ github.head_ref }}"
           else
             echo "${{ github.ref }}"
