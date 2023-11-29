@@ -1,4 +1,4 @@
-name: Determine github environment based on PR branch (not target branch)
+name: Determine github environment based on branch
 
 on:
   workflow_call:
@@ -10,7 +10,13 @@ jobs:
       - name: Select Environment
         id: select-environment
         run: |
-          case "${{ github.head_ref }}" in
+          if [[ "${{ github.head_ref }}" ]]
+          then
+            export VALUE="${{ github.base_ref }}"
+          else
+            export VALUE="${{ github.ref }}"
+          fi
+          case "$VALUE" in
             (main) echo "github-environment=prod" >> "$GITHUB_OUTPUT" ;;
             (beta) echo "github-environment=beta" >> "$GITHUB_OUTPUT" ;;
             (test) echo "github-environment=test" >> "$GITHUB_OUTPUT" ;;
