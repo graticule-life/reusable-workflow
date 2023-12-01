@@ -45,6 +45,8 @@ jobs:
       with:
           registry: ${{ vars.AWS_REGISTRY }}
     - name: Docker tag
-      run: docker tag ghcr.io/${{ env.REPO }}:${{ env.git_commit }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ env.git_commit }}
+      run: |
+        docker tag ghcr.io/${{ env.REPO }}:${{ env.git_commit }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ env.git_commit }}
+        docker tag ghcr.io/${{ env.REPO }}:${{ env.git_commit }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ inputs.environment }}
     - name: Docker push
       run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}
