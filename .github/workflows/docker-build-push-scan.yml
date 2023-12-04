@@ -14,7 +14,7 @@ on:
         type: string
 
 env:
-  git_commit: ${{ github.sha }}
+  git_commit: ${{ github.event.pull_request.head_sha }}
   REPO: ${{ github.repository }}
 
 jobs:
