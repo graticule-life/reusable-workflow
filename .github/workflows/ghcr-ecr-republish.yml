@@ -17,7 +17,6 @@ on:
         required: true
 
 env:
-  git_commit: ${{ github.sha }}
   REPO:       ${{ github.repository }}
 jobs:
   republish:
@@ -50,7 +49,7 @@ jobs:
           registry: ${{ vars.AWS_REGISTRY }}
     - name: Docker tag
       run: |
-        docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ env.git_commit }}
+        docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
         docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ inputs.environment }}
     - name: Docker push
       run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}
