@@ -1,0 +1,39 @@
+name: Use Copilot to deploy app to an environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'GitHub repo environment name'
+        required: true
+        type: string
+    secrets:
+      AWS_ROLE_TO_ASSUME:
+        description: 'IAM role with copilot permissions'
+        required: true
+
+jobs:
+  svc-deploy:
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Checkout repo
+      uses: actions/checkout@v4
+    # - name: Copilot svc deploy
+    #   uses: ksivamuthu/aws-copilot-github-action@v0.0.7
+    #   with:
+    #       command: deploy
+    #       app: ${{ vars.COPILOT_APPLICATION }}
+    #       env: ${{ vars.COPILOT_ENVIRONMENT }}
+    #       name: ${{ vars.COPILOT_SERVICE }}
+    #       version: v1.32.0
