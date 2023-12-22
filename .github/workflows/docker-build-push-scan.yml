@@ -14,7 +14,7 @@ on:
         type: string
       file:
         description: 'Dockerfile path'
-        default: './Dockerfile'
+        default: 'Dockerfile'
         type: string
 
 env:
