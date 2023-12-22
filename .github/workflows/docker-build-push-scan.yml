@@ -49,6 +49,7 @@ jobs:
           GIT_COMMIT=${{ inputs.gcr_tag }}
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+          ghcr.io/${{ env.REPO }}/${{ inputs.file }}:${{ inputs.gcr_tag }}
           ghcr.io/${{ env.REPO }}:latest
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
