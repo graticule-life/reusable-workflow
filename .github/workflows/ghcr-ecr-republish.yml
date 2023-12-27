@@ -46,8 +46,11 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Pull prior job built image
+    - name: Pull prior job base built image from GHCR
       run: docker pull ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+    - name: Pull prior job named built image from GHCR
+      if: ${{ inputs.file }} != ''
+      run: docker pull ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
@@ -68,7 +71,7 @@ jobs:
       if: ${{ inputs.file }} != ''
       run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}
 
-    ## Else, use the base repo name
+    ## Else, use the base repo name to find the image
     - name: Docker tag base image from GHCR
       if: ${{ inputs.file }} == ''
       run: |
