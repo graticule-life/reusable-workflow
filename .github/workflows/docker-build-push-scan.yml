@@ -44,13 +44,15 @@ jobs:
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
-        file: ${{ env.FILE }}
+        # use original file name when building image
+        file: ${{ inputs.file }}
         load: true
         cache-to: type=gha,mode=max
         cache-from: type=gha
         build-args: |
           BUILDKIT_INLINE_CACHE=1
           GIT_COMMIT=${{ inputs.gcr_tag }}
+        # use downcased file name when tagging and pushing for gcr
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
           ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }}
@@ -73,6 +75,7 @@ jobs:
         push: true
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+          ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }}
           ghcr.io/${{ env.REPO }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
