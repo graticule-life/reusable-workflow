@@ -71,7 +71,7 @@ jobs:
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
-        file: ${{ env.FILE }}
+        file: ${{ inputs.FILE }}
         push: true
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
