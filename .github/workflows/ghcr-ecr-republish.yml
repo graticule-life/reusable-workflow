@@ -63,20 +63,30 @@ jobs:
 
     ## If a specific file name is passed in, find the built (lowercase) image in ghcr to republish to ECR
     - name: Docker tag named image from GHCR
-      if: ${{ inputs.file }} != ''
       run: |
-        docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ github.sha }}
-        docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.environment }}
+        if [[ "${{ inputs.file }}" != "" ]]; then
+          docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ github.sha }}
+          docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.environment }}
+        fi
+        exit 0
     - name: Docker push named image to ECR
-      if: ${{ inputs.file }} != ''
-      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}
-
+      run: |
+        if [[ "${{ inputs.file }}" != "" ]]; then
+          docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}
+        fi
+        exit 0
     ## Else, use the base repo name to find the image
     - name: Docker tag base image from GHCR
-      if: ${{ inputs.file }} == ''
       run: |
-        docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
-        docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ inputs.environment }}
+        if [[ "${{ inputs.file }}" == "" ]]; then
+          docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
+          docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ inputs.environment }}
+        fi
+        exit 0
     - name: Docker push base image to ECR
-      if: ${{ inputs.file }} == ''
-      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}
+      run: |
+        if [[ "${{ inputs.file }}" == "" ]]; then
+          docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}
+        fi
+        exit 0
+   
