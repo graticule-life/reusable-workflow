@@ -16,6 +16,11 @@ on:
         default: ''
         required: false
         type: string
+      name:
+        description: ''
+        default: ''
+        type: string
+        required: false
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with ecr permissions'
@@ -23,7 +28,6 @@ on:
 
 env:
   REPO: ${{ github.repository }}
-  FILE: ${{ inputs.file }}
 
 jobs:
   republish:
@@ -35,9 +39,6 @@ jobs:
     steps:
     - name: downcase REPO
       run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
-    - name: downcase File name
-      if: ${{ inputs.file }} != ''
-      run: FILE_VAR=${{ env.FILE }} && echo "FILE=${FILE_VAR,,}" >> $GITHUB_ENV
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to GitHub Container Registry
@@ -49,8 +50,11 @@ jobs:
     - name: Pull prior job base built image from GHCR
       run: docker pull ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
     - name: Pull prior job named built image from GHCR
-      if: ${{ inputs.file }} != ''
-      run: docker pull ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }}
+      run: |
+        if [[ "${{ inputs.name }}" != "" ]]; then
+          docker pull ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
+        fi
+        exit 0
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
@@ -64,28 +68,28 @@ jobs:
     ## If a specific file name is passed in, find the built (lowercase) image in ghcr to republish to ECR
     - name: Docker tag named image from GHCR
       run: |
-        if [[ "${{ inputs.file }}" != "" ]]; then
-          docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ github.sha }}
-          docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.environment }}
+        if [[ "${{ inputs.name }}" != "" ]]; then
+          docker tag ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ inputs.name }}:${{ github.sha }}
+          docker tag ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.environment }}
         fi
         exit 0
     - name: Docker push named image to ECR
       run: |
-        if [[ "${{ inputs.file }}" != "" ]]; then
-          docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}
+        if [[ "${{ inputs.name }}" != "" ]]; then
+          docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ inputs.name }}
         fi
         exit 0
     ## Else, use the base repo name to find the image
     - name: Docker tag base image from GHCR
       run: |
-        if [[ "${{ inputs.file }}" == "" ]]; then
+        if [[ "${{ inputs.name }}" == "" ]]; then
           docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
           docker tag ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}:${{ inputs.environment }}
         fi
         exit 0
     - name: Docker push base image to ECR
       run: |
-        if [[ "${{ inputs.file }}" == "" ]]; then
+        if [[ "${{ inputs.name }}" == "" ]]; then
           docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}
         fi
         exit 0
