@@ -19,6 +19,7 @@ on:
 
 env:
   REPO: ${{ github.repository }}
+  FILE: ${{ inputs.file }}
 
 jobs:
   build:
@@ -26,6 +27,9 @@ jobs:
     steps:
     - name: downcase REPO
       run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+    - name: downcase File name
+      run: |
+        FILE_VAR=${{ env.FILE }} echo "FILE=${FILE_VAR,,}" >> "$GITHUB_ENV"
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to GitHub Container Registry
@@ -40,7 +44,7 @@ jobs:
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
-        file: ${{ inputs.file }}
+        file: ${{ env.FILE }}
         load: true
         cache-to: type=gha,mode=max
         cache-from: type=gha
@@ -65,7 +69,7 @@ jobs:
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
-        file: ${{ inputs.file }}
+        file: ${{ env.FILE }}
         push: true
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
