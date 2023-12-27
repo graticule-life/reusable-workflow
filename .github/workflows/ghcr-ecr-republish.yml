@@ -58,15 +58,15 @@ jobs:
       with:
           registry: ${{ vars.AWS_REGISTRY }}
 
-    ## If a specific file name is passed in, find the built (lowercase) image in ghcr to republish the (original) image name to ECR
+    ## If a specific file name is passed in, find the built (lowercase) image in ghcr to republish to ECR
     - name: Docker tag named image from GHCR
       if: ${{ inputs.file }} != ''
       run: |
-        docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ inputs.file }}:${{ github.sha }}
-        docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ inputs.file }}:${{ inputs.environment }}
+        docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ github.sha }}
+        docker tag ghcr.io/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.gcr_tag }} ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}:${{ inputs.environment }}
     - name: Docker push named image to ECR
       if: ${{ inputs.file }} != ''
-      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ inputs.file }}
+      run: docker push -a ${{ vars.AWS_REGISTRY }}/${{ env.REPO }}/${{ env.FILE }}
 
     ## Else, use the base repo name
     - name: Docker tag base image from GHCR
