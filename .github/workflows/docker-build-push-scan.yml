@@ -20,7 +20,7 @@ on:
         description: ''
         default: ''
         type: string
-        required: false
+        required: true
 
 env:
   REPO: ${{ github.repository }}
@@ -55,13 +55,12 @@ jobs:
           GIT_COMMIT=${{ inputs.gcr_tag }}
         # use input name when tagging and pushing for registries
         tags: |
-          ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+          ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
-          ghcr.io/${{ env.REPO }}:latest
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+        image-ref: ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
@@ -75,8 +74,7 @@ jobs:
         file: ${{ inputs.file }}
         push: true
         tags: |
-          ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
-          ghcr.io/${{ env.REPO }}:latest
+          ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
