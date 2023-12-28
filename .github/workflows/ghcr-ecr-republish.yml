@@ -11,10 +11,6 @@ on:
         description: 'Tag of image saved in GitHub Container Registry (head SHA from PR)'
         required: true
         type: string
-      file:
-        description: 'Dockerfile path for built image to be republished.'
-        default: ''
-        type: string
       name:
         description: ''
         default: ''
