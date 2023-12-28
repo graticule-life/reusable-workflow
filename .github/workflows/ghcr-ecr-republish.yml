@@ -47,8 +47,12 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Pull prior job base built image from GHCR
-      run: docker pull ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+    - name: Pull prior job base built image from GHCR if no name is given
+      run: |
+        if [[ "${{ inputs.name }}" == "" ]]; then
+          docker pull ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
+        fi
+        exit 0
     - name: Pull prior job named built image from GHCR
       run: |
         if [[ "${{ inputs.name }}" != "" ]]; then
@@ -65,7 +69,7 @@ jobs:
       with:
           registry: ${{ vars.AWS_REGISTRY }}
 
-    ## If a specific file name is passed in, find the built (lowercase) image in ghcr to republish to ECR
+    ## If a specific file name is passed in, find the named image in ghcr to republish to ECR
     - name: Docker tag named image from GHCR
       run: |
         if [[ "${{ inputs.name }}" != "" ]]; then

@@ -53,7 +53,7 @@ jobs:
         build-args: |
           BUILDKIT_INLINE_CACHE=1
           GIT_COMMIT=${{ inputs.gcr_tag }}
-        # use downcased file name when tagging and pushing for gcr
+        # use input name when tagging and pushing for registries
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
@@ -72,7 +72,7 @@ jobs:
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
-        file: ${{ inputs.FILE }}
+        file: ${{ inputs.file }}
         push: true
         tags: |
           ghcr.io/${{ env.REPO }}:${{ inputs.gcr_tag }}
