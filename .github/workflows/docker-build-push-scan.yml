@@ -51,7 +51,6 @@ jobs:
         cache-to: type=gha,mode=max
         cache-from: type=gha
         build-args: |
-          BUILDKIT_INLINE_CACHE=1
           GIT_COMMIT=${{ inputs.gcr_tag }}
         # use input name when tagging and pushing for registries
         tags: |
