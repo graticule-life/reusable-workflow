@@ -51,7 +51,6 @@ jobs:
         cache-to: type=gha,mode=max
         cache-from: type=gha
         build-args: |
-          BUILDKIT_INLINE_CACHE=1
           GIT_COMMIT=${{ inputs.gcr_tag }}
         # use input name when tagging and pushing for registries
         tags: |
@@ -67,14 +66,16 @@ jobs:
         vuln-type: 'os,library'
         severity: 'CRITICAL'
     - name: Docker push
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
         platforms: linux/amd64
         context: "{{ defaultContext }}:${{ inputs.context }}"
         file: ${{ inputs.file }}
         push: true
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          GIT_COMMIT=${{ inputs.gcr_tag }}
         tags: |
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
