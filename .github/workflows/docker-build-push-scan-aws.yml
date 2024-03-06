@@ -27,7 +27,7 @@ on:
         required: true
     secrets:
       AWS_ROLE_TO_ASSUME:
-        description: 'IAM role with ecr permissions'
+        description: 'IAM role with codeartifact permissions'
         required: true
 
 env:
