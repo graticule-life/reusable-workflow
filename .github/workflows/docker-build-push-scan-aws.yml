@@ -1,4 +1,4 @@
-# build and push to ghcr.io, scan with trivy
+# build with AWS creds as build-args and push to ghcr.io, scan with trivy
 name: Docker Image Build, Push and Scan
 
 on:
