@@ -89,17 +89,3 @@ jobs:
     - name: Docker push
       run: |
         docker push --all-tags ghcr.io/${{ env.REPO }}/${{ inputs.name }}
-    # - name: Docker push
-    #   uses: docker/build-push-action@v5
-    #   with:
-    #     platforms: linux/amd64
-    #     context: "{{ defaultContext }}:${{ inputs.context }}"
-    #     file: ${{ inputs.file }}
-    #     push: true
-    #     cache-from: type=gha
-    #     cache-to: type=gha,mode=max
-    #     build-args: |
-    #       GIT_COMMIT=${{ inputs.gcr_tag }}
-    #     tags: |
-    #       ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
-    #       ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
