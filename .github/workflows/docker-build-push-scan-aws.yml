@@ -1,9 +1,13 @@
-# build and push to ghcr.io, scan with trivy
+# build with AWS creds as build-args and push to ghcr.io, scan with trivy
 name: Docker Image Build, Push and Scan
 
 on:
   workflow_call:
     inputs:
+      environment:
+        description: 'GitHub environment name'
+        required: true
+        type: string
       gcr_tag:
         description: 'Tag of image saved in GitHub Container Registry (head SHA from PR)'
         required: true
@@ -21,12 +25,21 @@ on:
         default: ''
         type: string
         required: true
+    secrets:
+      AWS_ROLE_TO_ASSUME:
+        description: 'IAM role with codeartifact permissions'
+        required: true
 
 env:
   REPO: ${{ github.repository }}
 
 jobs:
   build:
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
     - name: downcase REPO
@@ -39,6 +52,11 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
     - name: Docker build
       id:   build
       uses: docker/build-push-action@v5
@@ -52,6 +70,9 @@ jobs:
         cache-from: type=gha
         build-args: |
           GIT_COMMIT=${{ inputs.gcr_tag }}
+          AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}
         # use input name when tagging and pushing for registries
         tags: |
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
