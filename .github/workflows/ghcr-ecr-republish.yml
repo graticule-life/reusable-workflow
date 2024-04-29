@@ -26,6 +26,7 @@ env:
 
 jobs:
   republish:
+    if: (github.actor != 'dependabot[bot]')
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write   # This is required for requesting the OIDC JWT
