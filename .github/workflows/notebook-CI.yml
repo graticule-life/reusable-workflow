@@ -1,0 +1,51 @@
+name: Generic CI workflow that runs GCD image with an override for the specific notebook to run
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'GitHub repo environment name'
+        required: true
+        type: string
+      notebook:
+        description: 'Notebook to run inside GCD image'
+        required: true
+        type: string
+      image-tag:
+        description: 'Tag of GCD image to use, defaults to latest'
+        type: string
+        default: latest
+    secrets:
+      AWS_ROLE_TO_ASSUME:
+        description: 'IAM role with ECR permissions'
+        required: true
+
+jobs:
+  notebook-CI:
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Checkout latest (or specified version) of gcd image from ECR    
+      env:
+        ECR_REGISTRY: 551686029881.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REPOSITORY: gcd
+        IMAGE_TAG: latest # TODO or arg if specified
+      run: |
+        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Run that above image with the specified notebook as entrypoint override
+      uses: addnab/docker-run-action@v3
+      with:
+        image: gcd:latest # TODO 
+        run: echo "hello world" # TODO
