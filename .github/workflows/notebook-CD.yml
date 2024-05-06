@@ -3,6 +3,7 @@ name: Generic CD workflow that preps a PR build for release by renaming the PR's
 on:
   workflow_call:
     inputs:
+      # TODO add schema param? Or get from Github directly from here?
       notebook:
         description: 'Notebook to run inside GCD image'
         required: true
@@ -29,4 +30,5 @@ jobs:
         queries: 'call system$wait(5);
                   select CURRENT_VERSION()
                   '
+                  # TODO do alter schema here
         # single quote is escaped with another single quote

@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       notebook:
+        # TODO add schema param? Or get from Github directly from here?
         description: 'Notebook to run inside GCD image'
         required: true
         type: string
@@ -44,6 +45,6 @@ jobs:
       with:
         image: 551686029881.dkr.ecr.us-east-1.amazonaws.com/gcd:latest # TODO cleanup
         run: |
-          echo "hello world" 
-        # TODO override run with our notebook
+          echo "hello world"
+        # TODO override run with our notebook startup command
         # TODO pass schema name param to notebook
