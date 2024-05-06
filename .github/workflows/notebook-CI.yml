@@ -42,5 +42,5 @@ jobs:
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
-        image: gcd:latest # TODO 
+        image: 551686029881.dkr.ecr.us-east-1.amazonaws.com/gcd:latest # TODO 
         run: echo "hello world" # TODO
