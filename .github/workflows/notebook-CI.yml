@@ -34,7 +34,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
     - name: Checkout latest (or specified version) of gcd image from ECR    
       env:
-        ECR_REGISTRY: 551686029881.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REGISTRY: 551686029881.dkr.ecr.us-east-1.amazonaws.com # TODO cleanup
         ECR_REPOSITORY: gcd
         IMAGE_TAG: latest # TODO or arg if specified
       run: |
@@ -42,5 +42,8 @@ jobs:
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
-        image: 551686029881.dkr.ecr.us-east-1.amazonaws.com/gcd:latest # TODO 
-        run: echo "hello world" # TODO
+        image: 551686029881.dkr.ecr.us-east-1.amazonaws.com/gcd:latest # TODO cleanup
+        run: |
+          echo "hello world" 
+        # TODO override run with our notebook
+        # TODO pass schema name param to notebook
