@@ -4,7 +4,6 @@ on:
   workflow_call:
     inputs:
       notebook:
-        # TODO add schema param? Or get from Github directly from here?
         description: 'Notebook to run inside GCD image'
         required: true
         type: string
@@ -12,6 +11,10 @@ on:
         description: 'Tag of GCD image to use, defaults to latest'
         type: string
         default: latest
+      schema:
+        description: 'Snowflake schema param to be passed into notebook, default <repo>_<PR#>'
+        type: string
+        default: ${{ github.repository }}_${{github.event.number}}
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with ECR permissions'
@@ -35,16 +38,16 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
     - name: Checkout latest (or specified version) of gcd image from ECR    
       env:
-        ECR_REGISTRY: 551686029881.dkr.ecr.us-east-1.amazonaws.com # TODO cleanup
-        ECR_REPOSITORY: gcd
-        IMAGE_TAG: latest # TODO or arg if specified
+        ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+        ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
       run: |
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
-        image: 551686029881.dkr.ecr.us-east-1.amazonaws.com/gcd:latest # TODO cleanup
+        image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
         run: |
-          echo "hello world"
+          echo "${{ inputs.notebook }} with ${{ inputs.schema }}"
         # TODO override run with our notebook startup command
         # TODO pass schema name param to notebook
