@@ -14,7 +14,7 @@ on:
       schema:
         description: 'Snowflake schema param to be passed into notebook, default <repo>_<PR#>'
         type: string
-        default: ${{ github.repository }}_${{github.event.number}}
+        default: ${{ github.repository.name }}_${{github.event.number}}
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with ECR permissions'
