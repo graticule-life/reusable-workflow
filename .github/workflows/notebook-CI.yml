@@ -46,9 +46,6 @@ jobs:
     - name: Set env
       run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
     # TODO create snowflake schema! Notebook expects it to exist
-    - name: "Debug"
-      run: |
-        pwd && ls -al notebooks
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       # TODO Mount repo into container
@@ -57,4 +54,7 @@ jobs:
         options: -v .:/home/jovyan
         run: |
           jupyter nbconvert --to notebook --execute ${{ inputs.notebook }}
+    - name: "Debug"
+      run: |
+        pwd && ls -al
     # TODO artifact mounted output/** for this PR
