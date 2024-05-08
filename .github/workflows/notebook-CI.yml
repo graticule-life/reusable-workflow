@@ -45,11 +45,14 @@ jobs:
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Set env
       run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
+    # TODO create snowflake schema! Notebook expects it to exist
+    - name: "Debug"
+      run: ls -alR
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
         run: |
-          jupyter nbconvert --execute ${{ inputs.notebook }}
-        # echo "${{ inputs.notebook }} with ${{ inputs.schema }}"
-        # TODO override run with our notebook startup command and pass schema name param to notebook
+          jupyter nbconvert --execute ${{ inputs.notebook }} 
+        # TODO fix path
+    # TODO artifact output/** for this PR
