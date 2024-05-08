@@ -51,8 +51,9 @@ jobs:
       # TODO Mount repo into container
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
-        options: -v .:/home/jovyan
+        options: -v ${{ github.workspace }}:/home/jovyan
         run: |
+          ls -al && 
           jupyter nbconvert --to notebook --execute ${{ inputs.notebook }}
     - name: "Debug"
       run: |
