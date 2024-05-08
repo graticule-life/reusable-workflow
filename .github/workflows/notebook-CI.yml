@@ -51,9 +51,10 @@ jobs:
         pwd && ls -al notebooks
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
+      # TODO Mount repo into container
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
+        options: -v .:/home/jovyan
         run: |
-          jupyter nbconvert --to notebook --execute /home/runner/work/Forked-STORM-Loopback-Analytics/Forked-STORM-Loopback-Analytics/${{ inputs.notebook }}
-        # TODO fix path
-    # TODO artifact output/** for this PR
+          jupyter nbconvert --to notebook --execute ${{ inputs.notebook }}
+    # TODO artifact mounted output/** for this PR
