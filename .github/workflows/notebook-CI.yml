@@ -53,6 +53,6 @@ jobs:
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
         run: |
-          jupyter nbconvert --execute ${{ inputs.notebook }} 
+          jupyter nbconvert --execute ./${{ inputs.notebook }} 
         # TODO fix path
     # TODO artifact output/** for this PR
