@@ -14,7 +14,7 @@ on:
       schema:
         description: 'Snowflake schema param to be passed into notebook, default <repo>_<PR#>'
         type: string
-        default: ${{ github.event.repository.name }}_${{github.event.number}}
+        default: ${{ github.event.repository.name }}_${{ github.event.number }}
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with ECR permissions'
@@ -43,12 +43,13 @@ jobs:
         IMAGE_TAG: ${{ inputs.image-tag }}
       run: |
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Set env
+      run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
         run: |
-          echo "${{ inputs.notebook }} with ${{ inputs.schema }} or ${{ github.event.repository.name }}_${{github.event.number}}"
-        # TODO override run with our notebook startup command
-        # ${{ github.repository.name }}_${{github.event.number}}
-        # TODO pass schema name param to notebook
+          jupyter nbconvert --execute ${{ inputs.notebook }}
+        # echo "${{ inputs.notebook }} with ${{ inputs.schema }}"
+        # TODO override run with our notebook startup command and pass schema name param to notebook

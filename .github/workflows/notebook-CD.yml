@@ -3,11 +3,14 @@ name: Generic CD workflow that preps a PR build for release by renaming the PR's
 on:
   workflow_call:
     inputs:
-      # TODO add schema param? Or get from Github directly from here?
       notebook:
         description: 'Notebook to run inside GCD image'
         required: true
         type: string
+      schema:
+        description: 'Snowflake schema param to be renamed, default <repo>_<PR#>'
+        type: string
+        default: ${{ github.event.repository.name }}_${{ github.event.number }}
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with ECR permissions'
@@ -31,4 +34,6 @@ jobs:
                   select CURRENT_VERSION()
                   '
                   # TODO do alter schema here
+                  # From  ${{ github.event.repository.name }}_${{ github.event.number }} 
+                  # To    ${{ github.event.repository.name }}_${{ github.event.pull_request.head.sha }}
         # single quote is escaped with another single quote
