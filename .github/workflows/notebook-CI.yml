@@ -45,17 +45,22 @@ jobs:
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Set env
       run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
-    # TODO create snowflake schema! Notebook expects it to exist
+    # Create snowflake schema! Notebook expects it to exist
+    - name: Create snowflake schema
+      uses: anecdotes-ai/snowflake-query@v1
+      with:
+        snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+        snowflake_warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+        snowflake_username: ${{ secrets.SNOWFLAKE_USER }}
+        snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        queries: |
+          'CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ github.event.repository.name }}_${{ github.event.number }}'
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
-      # TODO Mount repo into container
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
+        # Mount repo into container's home directory
         options: -v ${{ github.workspace }}:/home/jovyan
         run: |
-          ls -al && 
           jupyter nbconvert --to notebook --execute ${{ inputs.notebook }}
-    - name: "Debug"
-      run: |
-        pwd && ls -al
-    # TODO artifact mounted output/** for this PR
+    # TODO artifact mounted output/** (except 'archive') for this PR
