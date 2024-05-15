@@ -46,7 +46,7 @@ jobs:
     # Setup our action notebook to be in the same path as the input notebook
     - name: Setup action notebook path variable
       run: |
-        echo "$NB_PATH=$(dirname ${{ inputs.notebook }})" >> $GITHUB_ENV
+        echo "NB_PATH=$(dirname ${{ inputs.notebook }})" >> $GITHUB_ENV
     # Set env vars that will be used by action notebook
     - name: Setup input schema as env var
       run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
