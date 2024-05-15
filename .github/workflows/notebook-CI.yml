@@ -45,6 +45,10 @@ jobs:
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Set env
       run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
+    # TODO use jq to rename kernel to python3 and remove 'instance_type'
+    - name: Setup notebook kernel config
+      run: |
+        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' notebooks/papermill.ipynb)" > notebooks/papermill.ipynb
     # Create snowflake schema! Notebook expects it to exist
     - name: Create snowflake schema
       uses: anecdotes-ai/snowflake-query@v1
