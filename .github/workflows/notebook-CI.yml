@@ -54,7 +54,7 @@ jobs:
     # Use jq to rename kernel to python3 and remove 'instance_type'
     - name: Setup notebook kernel config into action.ipynb
       run: |
-        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ github.env.NB_PATH }}/action.ipynb
+        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ env.NB_PATH }}/action.ipynb
     # Modify repo for snowflake query, replace - with _
     - name: Setup snowflake schema name in github env
       run: |
@@ -68,7 +68,7 @@ jobs:
         snowflake_username: ${{ secrets.SNOWFLAKE_USER }}
         snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
         queries: |
-          CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ github.env.REPO }}_${{ github.event.number }}
+          CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ env.REPO }}_${{ github.event.number }}
     - name: Run that above image with action.ipynb as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
@@ -77,5 +77,5 @@ jobs:
         # TODO env vars?
         options: -v ${{ github.workspace }}:/home/jovyan
         run: |
-          jupyter nbconvert --to notebook --execute ${{ github.env.NB_PATH }}/action.ipynb
+          jupyter nbconvert --to notebook --execute ${{ env.NB_PATH }}/action.ipynb
     # TODO artifact mounted output/** (except 'archive') for this PR
