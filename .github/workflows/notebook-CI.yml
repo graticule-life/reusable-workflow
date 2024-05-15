@@ -51,7 +51,7 @@ jobs:
         echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' notebooks/papermill.ipynb)" > notebooks/papermill.ipynb
     # Create snowflake schema! Notebook expects it to exist
     - name: Create snowflake schema
-      uses: anecdotes-ai/snowflake-query@v1
+      uses: anecdotes-ai/snowflake-query@v1.2
       with:
         snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
         snowflake_warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
