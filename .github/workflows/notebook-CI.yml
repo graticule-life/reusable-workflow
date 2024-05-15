@@ -58,7 +58,7 @@ jobs:
         snowflake_username: ${{ secrets.SNOWFLAKE_USER }}
         snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
         queries: |
-          'CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ github.event.repository.name }}_${{ github.event.number }}'
+          CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ github.event.repository.name }}_${{ github.event.number }}
     - name: Run that above image with the specified notebook as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
