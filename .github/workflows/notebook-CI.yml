@@ -43,14 +43,23 @@ jobs:
         IMAGE_TAG: ${{ inputs.image-tag }}
       run: |
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-    - name: Set env
-      run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
-    # TODO use jq to rename kernel to python3 and remove 'instance_type'
-    - name: Setup notebook kernel config
+    # Setup our action notebook to be in the same path as the input notebook
+    - name: Setup action notebook path variable
       run: |
-        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' notebooks/papermill.ipynb)" > notebooks/papermill.ipynb
+        echo "$NB_PATH=$(dirname ${{ inputs.notebook }})" >> $GITHUB_ENV
+    # Set env vars that will be used by action notebook
+    - name: Setup input schema as env var
+      run: echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
+    # Use jq to rename kernel to python3 and remove 'instance_type'
+    - name: Setup notebook kernel config into action.ipynb
+      run: |
+        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ github.env.NB_PATH }}/action.ipynb
+    # Modify repo for snowflake query, replace - with _
+    - name: Setup snowflake schema name in github env
+      run: |
+        echo "REPO=$(echo ${{github.event.repository.name}} | tr - _)" >> $GITHUB_ENV
     # Create snowflake schema! Notebook expects it to exist
-    - name: Create snowflake schema
+    - name: Create snowflake schema for this PR
       uses: anecdotes-ai/snowflake-query@v1.2
       with:
         snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
@@ -58,13 +67,14 @@ jobs:
         snowflake_username: ${{ secrets.SNOWFLAKE_USER }}
         snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
         queries: |
-          CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ github.event.repository.name }}_${{ github.event.number }}
-    - name: Run that above image with the specified notebook as entrypoint override
+          CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ github.env.REPO }}_${{ github.event.number }}
+    - name: Run that above image with action.ipynb as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
         # Mount repo into container's home directory
+        # TODO env vars?
         options: -v ${{ github.workspace }}:/home/jovyan
         run: |
-          jupyter nbconvert --to notebook --execute ${{ inputs.notebook }}
+          jupyter nbconvert --to notebook --execute ${{ github.env.NB_PATH }}/action.ipynb
     # TODO artifact mounted output/** (except 'archive') for this PR
