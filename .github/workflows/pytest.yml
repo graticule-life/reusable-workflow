@@ -8,6 +8,10 @@ on:
         required: false
         default: ''
         type: string
+      python_version:
+        description: 'Python version for installation and testing'
+        required: true
+        type: string
       pytest_args:
         description: 'Additional arguments for pytest. Ex. pytest <dir/tests>'
         required: false
@@ -18,22 +22,21 @@ jobs:
   pytest:
     name: "Launch tests with pytest"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
+    # strategy:
+    #   matrix:
+    #     python-version: ["3.11", "3.12"]
   
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Set up Python ${{ matrix.python-version }}"
+      - name: "Set up Python ${{ inputs.python_version }}"
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ inputs.python_version }}
 
       - name: Run command
         if: ${{ inputs.cmd != '' }}
         run: ${{ inputs.cmd }}
-        shell: bash
 
       - name: Install dependencies
         run: |
@@ -46,4 +49,3 @@ jobs:
         run: |
           source venv/bin/activate
           pytest ${{ inputs.pytest_args }}
-        shell: bash
