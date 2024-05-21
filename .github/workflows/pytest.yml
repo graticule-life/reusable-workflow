@@ -2,6 +2,7 @@ name: Pytest
 
 on:
   workflow_call:
+    inputs:
       cmd:
         description: 'Command to run before pip install'
         required: false
