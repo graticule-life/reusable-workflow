@@ -22,7 +22,7 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12"]
     env:
-      COPILOT_ENVIRONMENT_NAME: ${{ github.event.inputs.environment }}
+      COPILOT_ENVIRONMENT_NAME: ${{ inputs.environment }}
   
     steps:
       - uses: actions/checkout@v4
@@ -42,5 +42,5 @@ jobs:
       - name: Run Pytest
         run: |
           source venv/bin/activate
-          pytest ${{ github.event.inputs.pytest_args }}
+          pytest ${{ inputs.pytest_args }}
         shell: bash
