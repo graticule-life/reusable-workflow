@@ -7,10 +7,12 @@ on:
         description: 'Copilot environment name'
         required: false
         default: ''
+        type: string
       pytest_args:
         description: 'Additional arguments for pytest. Ex. pytest <dir/tests>'
         required: false
-        default: 'test/'
+        default: ''
+        type: string
 
 jobs:
   pytest:
