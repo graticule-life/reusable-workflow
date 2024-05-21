@@ -1,0 +1,46 @@
+name: Pytest
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Copilot environment name'
+        required: false
+        default: ''
+      pytest_args:
+        description: 'Additional arguments for pytest. Ex. pytest <dir/tests>'
+        required: false
+        default: 'test/'
+
+jobs:
+  pytest:
+    name: "Launch tests with pytest"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    env:
+      COPILOT_ENVIRONMENT_NAME: ${{ github.event.inputs.environment }}
+  
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Run Pytest
+        run: |
+          source venv/bin/activate
+          pytest ${{ github.event.inputs.pytest_args }}
+        shell: bash
