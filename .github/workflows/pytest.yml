@@ -1,9 +1,7 @@
 name: Pytest
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
         description: 'Copilot environment name'
