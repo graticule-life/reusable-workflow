@@ -22,9 +22,6 @@ jobs:
   pytest:
     name: "Launch tests with pytest"
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     python-version: ["3.11", "3.12"]
   
     steps:
       - uses: actions/checkout@v4
