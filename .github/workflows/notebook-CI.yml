@@ -69,6 +69,12 @@ jobs:
         snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
         queries: |
           CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ env.REPO }}_${{ github.event.number }}
+    # Try AWS Login to get env vars
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
     - name: Run that above image with action.ipynb as entrypoint override
       uses: addnab/docker-run-action@v3
       with:
