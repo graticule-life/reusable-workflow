@@ -91,5 +91,5 @@ jobs:
           -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }}
         run: |
           cd ${{ env.NB_PATH }}
-          papermill action.ipynb output.json
+          /bin/bash -c papermill action.ipynb output.json
     # TODO artifact mounted output/** (except 'archive') for this PR
