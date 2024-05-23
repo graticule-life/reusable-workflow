@@ -73,9 +73,14 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
-        # Mount repo into container's home directory
-        # TODO env vars?
-        options: -v ${{ github.workspace }}:/home/jovyan
+        # Mount cloned repo into container's home directory
+        # Inject env vars: AWS vars to assume DataScientist role & snowflake schema
+        options: |
+          -v ${{ github.workspace }}:/home/jovyan \
+          -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }} \
+          -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          -e AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           jupyter nbconvert --to notebook --execute ${{ env.NB_PATH }}/action.ipynb
     # TODO artifact mounted output/** (except 'archive') for this PR
