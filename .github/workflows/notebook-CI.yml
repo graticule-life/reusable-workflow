@@ -84,11 +84,12 @@ jobs:
         # Mount cloned repo into container's home directory
         # Inject env vars: AWS vars to assume DataScientist role & snowflake schema
         options: |
-          -v ${{ github.workspace }}:/home/jovyan 
-          -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }} 
-          -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }} 
-          -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }} 
+          -v ${{ github.workspace }}:/home/jovyan
+          -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }}
+          -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
+          -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
           -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }}
         run: |
-          jupyter nbconvert --to notebook --execute ${{ env.NB_PATH }}/action.ipynb
+          cd ${{ env.NB_PATH }}
+          papermill action.ipynb output.json
     # TODO artifact mounted output/** (except 'archive') for this PR
