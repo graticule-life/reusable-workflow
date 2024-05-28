@@ -82,17 +82,16 @@ jobs:
       with:
         image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
         # Mount cloned repo into container's home directory
-        # Inject env vars: AWS vars to assume DataScientist role & snowflake schema
+        # Inject env: AWS vars to assume DataScientist role & snowflake schema
         options: |
           -v ${{ github.workspace }}:/home/jovyan
           -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }}
           -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
           -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
           -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }}
+        shell: bash
         run: |
           cd ${{ env.NB_PATH }}
           conda info
-          /bin/bash -c env
-          /bin/bash -c conda info
-          /bin/bash -c papermill action.ipynb output.json
+          papermill action.ipynb output.json
     # TODO artifact mounted output/** (except 'archive') for this PR
