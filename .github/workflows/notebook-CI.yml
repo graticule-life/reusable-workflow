@@ -78,7 +78,7 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         output-credentials: true
     - name: Change ownership of repo to docker user (jovyan)
-      run: chown 1000:100 -R ${{ github.workspace }}
+      run: sudo chown 1000:100 -R ${{ github.workspace }}
     - name: Run that above image with action.ipynb as entrypoint override
       run: |
         docker run --user 1000:100 -v ${{ github.workspace }}:/home/jovyan/work \
