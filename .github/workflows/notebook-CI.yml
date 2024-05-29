@@ -85,7 +85,7 @@ jobs:
         -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }} \
         -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }} \
         ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }} \
-        /bin/bash --login -c 'cd work/${{ env.NB_PATH }}; touch output.json; ls -al; conda init bash; source ~/.bashrc; conda activate datascience; conda info; papermill action.ipynb output.json'
+        /bin/bash -c 'cd work/${{ env.NB_PATH }}; touch output.json; ls -al; conda init bash; source ~/.bashrc; conda activate datascience; conda info; papermill action.ipynb output.json'
 
       # uses: addnab/docker-run-action@v3
       # with:
