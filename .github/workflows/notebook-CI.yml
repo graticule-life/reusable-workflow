@@ -79,7 +79,7 @@ jobs:
         output-credentials: true
     - name: Run that above image with action.ipynb as entrypoint override
       run: |
-        docker run -v ${{ github.workspace }}:/home/jovyan/work \
+        docker run --user 1000:100 -v ${{ github.workspace }}:/home/jovyan/work \
         -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }} \
         -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }} \
         -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }} \
