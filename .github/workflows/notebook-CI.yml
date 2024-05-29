@@ -93,5 +93,5 @@ jobs:
           cd work/${{ env.NB_PATH }}
           conda info
           ls -al
-          /bin/bash -c 'conda info; papermill action.ipynb output.json'
+          /bin/bash --login -c 'conda info; papermill action.ipynb output.json'
     # TODO artifact mounted output/** (except 'archive') for this PR
