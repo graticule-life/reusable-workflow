@@ -44,22 +44,21 @@ jobs:
       run: |
         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     # Setup our action notebook to be in the same path as the input notebook
-    - name: Setup action notebook path variable
+    - name: Setup action notebook path
       run: |
         echo "NB_PATH=$(dirname ${{ inputs.notebook }})" >> $GITHUB_ENV
-    # Set env vars that will be used by action notebook
-    - name: Setup input schema as env var
-      run: |
-        echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
     # Use jq to rename kernel to python3 and remove 'instance_type'
-    - name: Setup notebook kernel config into action.ipynb
+    - name: Setup notebook kernel into action.ipynb
       run: |
         echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ env.NB_PATH }}/action.ipynb
     # Modify repo for snowflake query, replace - with _
-    - name: Setup snowflake schema name in github env
+    - name: Setup snowflake schema name
       run: |
         echo "REPO=$(echo ${{github.event.repository.name}} | tr - _)" >> $GITHUB_ENV
-    # Create snowflake schema! Notebook expects it to exist
+    - name: Setup input schema for image
+      run: |
+        echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
+    # Create snowflake schema. Notebook expects it to exist
     - name: Create snowflake schema for this PR
       uses: anecdotes-ai/snowflake-query@v1.2
       with:
@@ -69,7 +68,7 @@ jobs:
         snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
         queries: |
           CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ env.REPO }}_${{ github.event.number }}
-    # Try AWS Login to get env vars
+    # AWS Login to get env vars for image
     - name: Configure AWS Credentials
       id: creds
       uses: aws-actions/configure-aws-credentials@v4
@@ -91,21 +90,3 @@ jobs:
         -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }} \
         ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }} \
         /bin/bash -c 'cd work/${{ env.NB_PATH }};ls -al; eval "$(conda shell.bash hook)"; source activate datascience; conda info; papermill action.ipynb output.json'
-
-      # uses: addnab/docker-run-action@v3
-      # with:
-      #   image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }}
-      #   # Mount cloned repo into container's home directory
-      #   # Inject env: AWS vars to assume DataScientist role & snowflake schema
-      #   options: |
-      #     -v ${{ github.workspace }}:/home/jovyan/work
-      #     -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }}
-      #     -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
-      #     -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
-      #     -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }}
-      #   run: |
-      #     cd work/${{ env.NB_PATH }}
-      #     conda info
-      #     ls -al
-      #     /bin/bash --login -c 'conda info; papermill action.ipynb output.json'
-    # TODO artifact mounted output/** (except 'archive') for this PR
