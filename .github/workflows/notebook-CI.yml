@@ -83,7 +83,7 @@ jobs:
         docker run --user 1000:100 \
         -v ${{ github.workspace }}:/home/jovyan/work \
         --entrypoint="" \
-        -w work/${{ env.NB_PATH }} \
+        -w /home/jovyan/work/${{ env.NB_PATH }} \
         -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }} \
         -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }} \
         -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }} \
