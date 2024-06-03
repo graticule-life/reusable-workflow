@@ -83,10 +83,11 @@ jobs:
         docker run --user 1000:100 \
         -v ${{ github.workspace }}:/home/jovyan/work \
         --entrypoint="" \
+        -w work/${{ env.NB_PATH }} \
         -e PR_DERIVED_SCHEMA_NAME=${{ inputs.schema }} \
         -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }} \
         -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }} \
         -e AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }} \
         -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }} \
         ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }} \
-        /bin/bash -c 'mkdir work/output/notebooks; cd work/${{ env.NB_PATH }}; ls -al; conda run --cwd /home/jovyan/work/${{ env.NB_PATH }} -n datascience papermill action.ipynb output.json'
+        /bin/bash -c 'conda run -n datascience papermill action.ipynb output.json'
