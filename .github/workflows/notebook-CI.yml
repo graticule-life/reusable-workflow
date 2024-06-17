@@ -95,5 +95,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: notebook-outputs
-        path: work/
+        path: */
         compression-level: 6
