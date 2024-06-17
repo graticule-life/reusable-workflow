@@ -95,5 +95,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: notebook-outputs
-        path: **
+        path: ${{ github.workspace }}/
         compression-level: 6
