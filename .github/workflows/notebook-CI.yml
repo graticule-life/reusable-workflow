@@ -50,7 +50,7 @@ jobs:
     # Use jq to rename kernel to python3 and remove 'instance_type'
     - name: Setup notebook kernel into action.ipynb
       run: |
-        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ env.NB_PATH }}/action.ipynb
+        echo "$(jq '.metadata.kernelspec.name = "conda-env-datascience-py" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ env.NB_PATH }}/action.ipynb
     # Modify repo for snowflake query, replace - with _
     - name: Setup snowflake schema name
       run: |
