@@ -95,12 +95,14 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: notebook-outputs
-        path: ${{ github.workspace }}/
+        path: |
+          ${{ github.workspace }}/output/notebooks
+          ${{ github.workspace }}/notebooks/output.ipynb
         compression-level: 6
     - name: Upload artifact outputs
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
         name: artifact-outputs
-        path: ${{ github.workspace }}/
+        path: ${{ github.workspace }}/output/artifacts
         compression-level: 6
