@@ -90,3 +90,10 @@ jobs:
         -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }} \
         ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }} \
         /bin/bash -c 'conda run --cwd work/${{ env.NB_PATH }} -n datascience papermill action.ipynb output.json'
+    - name: Upload artifacts
+      if: success() || failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: notebook-outputs
+        path: work/outputs
+        compression-level: 6
