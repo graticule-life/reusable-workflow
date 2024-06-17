@@ -57,7 +57,7 @@ jobs:
         echo "REPO=$(echo ${{github.event.repository.name}} | tr - _)" >> $GITHUB_ENV
     - name: Setup input schema for image
       run: |
-        echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ inputs.schema }})" >> $GITHUB_ENV
+        echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ env.REPO }}_${{ github.event.number }})" >> $GITHUB_ENV
     # Create snowflake schema. Notebook expects it to exist
     - name: Create snowflake schema for this PR
       uses: anecdotes-ai/snowflake-query@v1.2
