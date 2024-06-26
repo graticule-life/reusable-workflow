@@ -21,6 +21,10 @@ on:
         default: ''
         type: string
         required: true
+      build-args:
+        description: 'Build args to pass to docker build'
+        default: ''
+        type: string
 
 env:
   REPO: ${{ github.repository }}
@@ -52,6 +56,7 @@ jobs:
         cache-from: type=gha
         build-args: |
           GIT_COMMIT=${{ inputs.gcr_tag }}
+          ${{ inputs.build-args }}
         # use input name when tagging and pushing for registries
         tags: |
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
