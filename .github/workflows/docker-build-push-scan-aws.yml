@@ -84,8 +84,8 @@ jobs:
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
-        vuln-type: 'os,library'
         severity: 'CRITICAL'
+        scanners: 'vuln'
     - name: Docker push
       run: |
         docker push --all-tags ghcr.io/${{ env.REPO }}/${{ inputs.name }}
