@@ -89,7 +89,7 @@ jobs:
         -e AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }} \
         -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }} \
         ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }} \
-        /bin/bash -c 'conda run --cwd work/${{ env.NB_PATH }} -n datascience papermill action.ipynb output.ipynb'
+        /bin/bash -c 'conda run --cwd work/${{ env.NB_PATH }} -n base papermill action.ipynb output.ipynb'
     - name: Upload notebook outputs
       if: success() || failure()
       uses: actions/upload-artifact@v4
