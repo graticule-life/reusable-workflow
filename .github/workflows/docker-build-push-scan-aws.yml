@@ -25,6 +25,10 @@ on:
         default: ''
         type: string
         required: true
+      build-args:
+        description: 'Additional Docker build-args'
+        default: ''
+        type: string
     secrets:
       AWS_ROLE_TO_ASSUME:
         description: 'IAM role with codeartifact permissions'
@@ -73,6 +77,7 @@ jobs:
           AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}
+          ${{ inputs.build-args }}
         # use input name when tagging and pushing for registries
         tags: |
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
