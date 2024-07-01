@@ -1,0 +1,110 @@
+name: Generic CI workflow that runs GCD image with an override for the specific notebook to run
+
+on:
+  workflow_call:
+    inputs:
+      notebook:
+        description: 'Notebook to run inside GCD image'
+        required: true
+        type: string
+      image-tag:
+        description: 'Tag of GCD image to use, defaults to latest'
+        type: string
+        default: latest
+      schema:
+        description: 'Snowflake schema param to be passed into notebook, default <repo>_<PR#>'
+        type: string
+        default: ${{ github.event.repository.name }}_${{ github.event.number }}
+      docker-args:
+        description: '(Optional) Additional docker run args to inject'
+        type: string
+        default: ''
+jobs:
+  notebook-CI:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Checkout latest (or specified version) of gcd image from ECR    
+      env:
+        ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+        ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
+      run: |
+        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    # Setup our action notebook to be in the same path as the input notebook
+    - name: Setup action notebook path
+      run: |
+        echo "NB_PATH=$(dirname ${{ inputs.notebook }})" >> $GITHUB_ENV
+    # Use jq to rename kernel to python3 and remove 'instance_type'
+    - name: Setup notebook kernel into action.ipynb
+      run: |
+        echo "$(jq '.metadata.kernelspec.name = "python3" | del(.metadata.instance_type)' ${{ inputs.notebook }})" > ${{ env.NB_PATH }}/action.ipynb
+    # Modify repo for snowflake query, replace - with _
+    - name: Cleanup snowflake schema name
+      run: |
+        echo "REPO=$(echo ${{github.event.repository.name}} | tr - _ | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+    - name: Setup schema input for notebook
+      run: |
+        echo "PR_DERIVED_SCHEMA_NAME=$(echo ${{ env.REPO }}_${{ github.event.number }})" >> $GITHUB_ENV
+    # Create snowflake schema. Notebook expects it to exist
+    - name: Create snowflake schema for this PR
+      uses: anecdotes-ai/snowflake-query@v1.2
+      with:
+        snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+        snowflake_warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+        snowflake_username: ${{ secrets.SNOWFLAKE_USER }}
+        snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        queries: |
+          CREATE OR REPLACE SCHEMA ${{ vars.SNOWFLAKE_DATABASE }}.${{ env.PR_DERIVED_SCHEMA_NAME }}
+    # AWS Login to get env vars for image
+    - name: Configure AWS Credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        output-credentials: true
+    - name: Change ownership of repo to docker user (jovyan)
+      run: sudo chown 1000:100 -R ${{ github.workspace }}
+    - name: Run that above image with action.ipynb as entrypoint override
+      run: |
+        docker run \
+        -v ${{ github.workspace }}:/home/jovyan/work \
+        -e PR_DERIVED_SCHEMA_NAME=${{ env.PR_DERIVED_SCHEMA_NAME }} \
+        -e AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }} \
+        -e AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }} \
+        -e AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }} \
+        -e AWS_DEFAULT_REGION=${{ vars.AWS_REGION }} \
+        -e sf_username=${{ secrets.SNOWFLAKE_USER }} \
+        -e sf_password=${{ secrets.SNOWFLAKE_PASSWORD }} \
+        ${{ inputs.env }} \
+        ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ inputs.image-tag }} \
+        /bin/bash -c 'conda run --cwd work/${{ env.NB_PATH }} -n base papermill action.ipynb output.ipynb'
+    # Upload artifacts separately
+    - name: Upload notebook outputs
+      if: success() || failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: notebook-outputs
+        path: |
+          ${{ github.workspace }}/output/notebooks
+          ${{ github.workspace }}/notebooks/output.ipynb
+        compression-level: 6
+    - name: Upload artifact outputs
+      if: success() || failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifact-outputs
+        path: ${{ github.workspace }}/output/artifacts
+        compression-level: 6

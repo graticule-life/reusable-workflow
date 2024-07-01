@@ -77,6 +77,12 @@ jobs:
         tags: |
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:latest
           ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        large-packages: false
+        docker-images: false
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
@@ -84,7 +90,7 @@ jobs:
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
-        vuln-type: 'os,library'
+        scanners: 'vuln'
         severity: 'CRITICAL'
     - name: Docker push
       run: |
