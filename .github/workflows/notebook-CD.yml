@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Run Snowflake query
-      uses: anecdotes-ai/snowflake-query@v1
+      uses: anecdotes-ai/snowflake-query@v1.2
       with:
         snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
         snowflake_warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
@@ -36,4 +36,3 @@ jobs:
                   # TODO do alter schema here
                   # From  ${{ github.event.repository.name }}_${{ github.event.number }} 
                   # To    ${{ github.event.repository.name }}_${{ github.event.pull_request.head.sha }}
-        # single quote is escaped with another single quote
