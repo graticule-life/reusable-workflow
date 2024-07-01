@@ -49,13 +49,10 @@ jobs:
       with:
         aws-region: ${{ vars.AWS_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-        output-credentials: true
     - name: Login to ECR
       uses: docker/login-action@v3
       with:
         registry: ${{ vars.AWS_REGISTRY }}
-        username: ${{ steps.aws-creds.outputs.aws-access-key-id }}
-        password: ${{ steps.aws-creds.outputs.aws-secret-access-key }}
     - name: Pull prior built named image from GHCR
       run: docker pull ghcr.io/${{ env.REPO }}/${{ inputs.name }}:${{ inputs.gcr_tag }}
     - name: Docker tag named image from GHCR
